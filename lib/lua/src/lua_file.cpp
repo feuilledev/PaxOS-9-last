@@ -49,6 +49,10 @@ std::shared_ptr<LuaHttpClient> LuaNetwork::createHttpClient()
     return std::make_shared<LuaHttpClient>(lua);
 }*/
 
+#include "example.hpp" // Ajoute ceci en haut du fichier
+
+// ...existing code...
+
 LuaFile::LuaFile(storage::Path filename, storage::Path manifest) :
     lua_gui(this), lua_storage(this), lua_time(this) /*,
                                        lua_network(this)*/
@@ -56,6 +60,16 @@ LuaFile::LuaFile(storage::Path filename, storage::Path manifest) :
     this->filename = filename;
     this->manifest = manifest;
     this->directory = filename / storage::Path("..");
+
+    // add example function
+    lua.new_usertype<LuaExample>(
+        "Example",
+        sol::base_classes,
+        sol::bases<LuaWidget>(),
+
+        "example",
+        &LuaExample::example
+    );
 }
 
 LuaFile::~LuaFile()

@@ -9,6 +9,10 @@
 #include "lua_json.hpp"
 #include "lua_storage.hpp"
 
+// import example lua truc
+#include "example.hpp"
+
+
 #include <filestream.hpp>
 #include <gui.hpp>
 #include <hardware.hpp>
