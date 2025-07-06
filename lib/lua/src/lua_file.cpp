@@ -61,7 +61,7 @@ LuaFile::LuaFile(storage::Path filename, storage::Path manifest) :
     this->manifest = manifest;
     this->directory = filename / storage::Path("..");
 
-    // add example function
+    // [Add your custom function here.]
     lua.new_usertype<LuaExample>(
         "Example",
         sol::base_classes,
