@@ -1,21 +1,28 @@
 #ifndef ELEMENTBASE_HPP
 #define ELEMENTBASE_HPP
 
-#include <cstdint> // for uint16_t
-#include <vector>
+#define USE_DOUBLE_BUFFERING
 
 #include "Surface.hpp"
 
+#include <cstdint> // for uint16_t
+#include <vector>
+
 typedef uint16_t color_t; // @Charles a remplacer quand tu auras mis la lib graphique
+#ifdef USE_DOUBLE_BUFFERING
+#define SCROLL_STEP 1
+#else
 #define SCROLL_STEP 20
+#endif
 
 namespace gui
 {
     class ElementBase
     {
-    public:
+      public:
         ElementBase();
         virtual ~ElementBase();
+        static void resetStates();
 
         virtual void render() = 0;
         void renderAll(bool onScreen = true);
@@ -52,10 +59,12 @@ namespace gui
         color_t getBackgroundColor() const;
         color_t getBorderColor() const;
 
-        bool isTouched(); // retourne si le widget a été pressé puis relaché (nb, l'appel de la fonction annule m'état précédent)
+        bool isTouched();                    // retourne si le widget a été pressé puis relaché (nb,
+                                             // l'appel de la fonction annule m'état précédent)
         bool isFocused(bool forced = false); // retourne si le doigt est sur le widget
 
         virtual void onClick() {}
+
         virtual void onLongClick() {}
 
         /**
@@ -63,18 +72,18 @@ namespace gui
          */
         virtual void onReleased() {}
 
-        
         /**
-         * \brief When the widget is no longer considered as touched even if the finger is still on the screen
-         */virtual void onNotClicked() {}
-
-        virtual void onScroll() {}
+         * \brief When the widget is no longer considered as touched even if the
+         * finger is still on the screen
+         */
+        virtual void onNotClicked() {}
 
         void enable();
         void disable();
         bool getIsEnabled() const;
 
-        void free();    // free the buffers in the ram to allow more windows to work at the same time
+        void free(); // free the buffers in the ram to allow more windows to work at
+                     // the same time
 
         void setEnabled(bool enabled);
         [[nodiscard]] bool isEnabled() const;
@@ -83,14 +92,14 @@ namespace gui
          * \brief Get the highest parent widget in the hierachy
          * \return the highest parent in the hierarchy
          */
-        ElementBase *getMaster();
-        ElementBase *getParent() const;
-        void addChild(ElementBase *child);
+        ElementBase* getMaster();
+        ElementBase* getParent() const;
+        void addChild(ElementBase* child);
 
-        ElementBase *getElementAt(int index);
+        ElementBase* getElementAt(int index);
 
-        ElementBase *m_parent;
-        std::vector<ElementBase *> m_children;
+        ElementBase* m_parent;
+        std::vector<ElementBase*> m_children;
         static int16_t touchX, touchY;
         static int16_t lastEventTouchX, lastEventTouchY;
 
@@ -101,7 +110,7 @@ namespace gui
 
         void forceUpdate();
 
-    protected:
+      protected:
         void freeRamFor(uint32_t size, ElementBase* window);
 
         // variables générales
@@ -113,6 +122,7 @@ namespace gui
         uint16_t m_borderSize;
         uint16_t m_borderRadius;
 
+        uint16_t hitboxFactor = 10; // factor to increase the hitbox of the widget in pixels
 
         // variables sur les mouvements
         bool m_verticalScrollEnabled;
@@ -128,8 +138,8 @@ namespace gui
 
         bool m_isRendered; // si le buffer est a jour
         bool m_isDrawn;    // si le widget est bien a jour sur l'écran
-        static ElementBase *masterOfRender;
-        static ElementBase *mainWindow;
+        static ElementBase* masterOfRender;
+        static ElementBase* mainWindow;
 
         // variables sur les events
         enum PressedState
@@ -146,7 +156,7 @@ namespace gui
         PressedState m_pressedState;
 
         static PressedState globalPressedState;
-        static ElementBase *widgetPressed; // si un widget est préssé sur l'écran (sinon nullptr)
+        static ElementBase* widgetPressed; // si un widget est préssé sur l'écran (sinon nullptr)
         static int16_t originTouchX, originTouchY;
 
         ElementBase* getHigestXScrollableParent();
@@ -155,6 +165,7 @@ namespace gui
         bool isInside(); // si le widget est visible dans son parent
 
         static int16_t m_lastTouchX, m_lastTouchY;
+        static bool wasPressed; // if the screen was pressed in the last update
         void getLastTouchPosAbs(int16_t* x, int16_t* y) const;
         void getLastTouchPosRel(int16_t* x, int16_t* y) const;
 
@@ -162,10 +173,15 @@ namespace gui
         virtual void onScrollDown() {};
         virtual void onScrollLeft() {};
         virtual void onScrollRight() {};
+        virtual void onScroll(int16_t x, int16_t y) {};
 
-        std::shared_ptr<graphics::Surface> m_surface; // Surface to render the widget
-        std::shared_ptr<graphics::Surface> getAndSetSurface(); // Get the m_surface of the the ElementBase and initialize it if it is nullptr
-    protected:
+        std::shared_ptr<graphics::Surface> m_surface;         // Surface to render the widget
+        std::shared_ptr<graphics::Surface> m_surface_for_dma; // double buffer for DMA transfer
+        bool do_use_double_buffering = false;
+        std::shared_ptr<graphics::Surface>
+            getAndSetSurface(); // Get the m_surface of the the ElementBase and
+                                // initialize it if it is nullptr
+      protected:
         void localGraphicalUpdate();
         void globalGraphicalUpdate();
         void setParentNotRendered();
@@ -173,6 +189,6 @@ namespace gui
         void setChildrenDrawn();
         void setChildrenNotDrawn();
     };
-}
+} // namespace gui
 
 #endif
