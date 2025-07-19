@@ -172,15 +172,11 @@ void applications::launcher::update()
         if (lastNetwork != Gsm::getNetworkQuality().first)
         {
             if (Gsm::getNetworkQuality().first == 99)
-            {
                 networkLabel->setText("X");
-            }
             else
-            {
                 networkLabel->setText(
                     std::to_string((int) Gsm::getNetworkQuality().first * 100 / 31) + "%"
                 );
-            }
 
             lastNetwork = Gsm::getNetworkQuality().first;
         }
@@ -279,15 +275,11 @@ void applications::launcher::draw()
     { // Network
         networkLabel = new Label(2, 2, 30, 18);
         if (Gsm::getNetworkQuality().first == 99)
-        {
             networkLabel->setText("X");
-        }
         else
-        {
             networkLabel->setText(
                 std::to_string((int) Gsm::getNetworkQuality().first * 100 / 31) + "%"
             );
-        }
         networkLabel->setVerticalAlignment(Label::Alignement::CENTER);
         networkLabel->setHorizontalAlignment(Label::Alignement::CENTER);
         networkLabel->setFontSize(18);
@@ -361,9 +353,8 @@ void applications::launcher::draw()
         text->setFontSize(16);
         box->addChild(text);
 
-        /*if(storage::Path notifs = (app->path / ".." / "unread.txt");
-        notifs.exists()) { storage::FileStream file(notifs.str(),
-        storage::READ);
+        /*if(storage::Path notifs = (app->path / ".." / "unread.txt"); notifs.exists()) {
+            storage::FileStream file(notifs.str(), storage::READ);
 
             if(file.size() > 0) {
                 auto* notifBox = new Box(66, 0, 14, 14);
